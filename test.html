@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CFA Interactivity xAPI Example</title>
-    <script src="xAPI_CFA.js"></script>
+    
+    <!-- Hosted at GitHub for production (specific version v1.0.2) -->
+    <script src="https://cdn.jsdelivr.net/gh/cfa-pl/cfa_xapi/xAPI_CFA.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,12 +87,12 @@
         async function sendBasicStatement() {
             try {
                 // Create components
-                const actor = createXAPIActor('John Doe', 'john.doe@example.com');
+                const actor = createXAPIActor('Roger Rabbit', 'roger.rabbit@example.com');
                 const verb = createXAPIVerb(XAPIVerbs.COMPLETED, 'completed');
                 const activity = createXAPIActivity(
-                    'http://example.com/course/basic-training',
-                    'Basic Training Course',
-                    'An introductory training course'
+                    'http://example.com/course/example-derivatives-url',
+                    'CFA Level I',
+                    'Derivatives Course'
                 );
                 const result = createXAPIResult(true, true, 0.85);
 
@@ -106,12 +109,12 @@
         async function sendComplexStatement() {
             try {
                 // Create components with more detail
-                const actor = createXAPIActor('Jane Smith', 'jane.smith@example.com');
+                const actor = createXAPIActor('Harry Hare', 'harry.hare@example.com');
                 const verb = createXAPIVerb(XAPIVerbs.PASSED, 'passed');
                 const activity = createXAPIActivity(
-                    'http://example.com/assessment/advanced-test',
-                    'Advanced Assessment',
-                    'A comprehensive assessment covering advanced topics',
+                    'http://example.com/course/example-derivatives-url',
+                    'CFA Level I',
+                    'Derivatives Course',
                     XAPIActivityTypes.ASSESSMENT
                 );
                 
@@ -153,8 +156,8 @@
                     const verb = createXAPIVerb(XAPIVerbs.ATTENDED, 'attended');
                     const activity = createXAPIActivity(
                         `http://example.com/session/session-${i}`,
-                        `Training Session ${i}`,
-                        `Session ${i} of the training program`
+                        `Module ${i}`,
+                        `Lesson ${i} of Derivatives`
                     );
                     
                     const statement = createXAPIStatement(actor, verb, activity);
