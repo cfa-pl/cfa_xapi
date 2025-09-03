@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFA Interactivity xAPI Example</title>
+    <script src="xAPI_CFA.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .container {
+            background: rgb(245, 245, 245);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px dotted black;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <img src="CFA_Logo.jpg" alt="CFA Logo" style="max-width: 200px; display: block; margin: 0 auto 20px;">
+    <div class="container">
+        <h1>CFA Interactivity xAPI  Example</h1>
+        <p>This example shows how to use the xAPI_CFA.js library to send learning statements for interactivities.</p>
+        
+        <button onclick="sendBasicStatement()">Send Basic Statement</button>
+        <button onclick="sendComplexStatement()">Send Complex Statement</button>
+        <button onclick="sendMultipleStatements()">Send Multiple Statements</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        // Configure the xAPI library on page load
+        window.addEventListener('load', function() {
+            configureXAPI(
+                'https://watershedlrs.com/api/organizations/27622/lrs/',
+                'c578e01557e828',
+                'e3b461ff7d1583'
+            );
+        });
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+
+        async function sendBasicStatement() {
+            try {
+                // Create components
+                const actor = createXAPIActor('John Doe', 'john.doe@example.com');
+                const verb = createXAPIVerb(XAPIVerbs.COMPLETED, 'completed');
+                const activity = createXAPIActivity(
+                    'http://example.com/course/basic-training',
+                    'Basic Training Course',
+                    'An introductory training course'
+                );
+                const result = createXAPIResult(true, true, 0.85);
+
+                // Create and send statement
+                const statement = createXAPIStatement(actor, verb, activity, result);
+                await sendXAPIStatement(statement);
+                
+                showResult(`Basic statement sent successfully! ID: ${statement.id}`, 'success');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function sendComplexStatement() {
+            try {
+                // Create components with more detail
+                const actor = createXAPIActor('Jane Smith', 'jane.smith@example.com');
+                const verb = createXAPIVerb(XAPIVerbs.PASSED, 'passed');
+                const activity = createXAPIActivity(
+                    'http://example.com/assessment/advanced-test',
+                    'Advanced Assessment',
+                    'A comprehensive assessment covering advanced topics',
+                    XAPIActivityTypes.ASSESSMENT
+                );
+                
+                const result = createXAPIResult(
+                    true,        // completion
+                    true,        // success
+                    0.92,        // scaled score
+                    92,          // raw score
+                    0,           // min score
+                    100,         // max score
+                    'PT45M'      // duration (45 minutes)
+                );
+
+                const instructor = createXAPIActor('Dr. Wilson', 'dr.wilson@example.com');
+                const context = createXAPIContext(
+                    instructor,
+                    generateXAPIUUID(), // registration
+                    null,
+                    'en-US'
+                );
+
+                // Create and send statement
+                const statement = createXAPIStatement(actor, verb, activity, result, context);
+                await sendXAPIStatement(statement);
+                
+                showResult(`Complex statement sent successfully! ID: ${statement.id}`, 'success');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function sendMultipleStatements() {
+            try {
+                const statements = [];
+                
+                // Create multiple statements
+                for (let i = 1; i <= 3; i++) {
+                    const actor = createXAPIActor(`Student ${i}`, `student${i}@example.com`);
+                    const verb = createXAPIVerb(XAPIVerbs.ATTENDED, 'attended');
+                    const activity = createXAPIActivity(
+                        `http://example.com/session/session-${i}`,
+                        `Training Session ${i}`,
+                        `Session ${i} of the training program`
+                    );
+                    
+                    const statement = createXAPIStatement(actor, verb, activity);
+                    statements.push(statement);
+                }
+
+                // Send all statements at once
+                await sendXAPIStatements(statements);
+                
+                showResult(`Successfully sent ${statements.length} statements!`, 'success');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
